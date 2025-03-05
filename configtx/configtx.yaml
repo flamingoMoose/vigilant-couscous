@@ -17,47 +17,89 @@ Organizations:
     OrdererEndpoints:
       - orderer.example.com:7050
 
-  - &Org1
-    Name: Org1MSP
-    ID: Org1MSP
-    MSPDir: ../crypto-config/peerOrganizations/org1.example.com/msp
+  - &MAS
+    Name: MASMSP
+    ID: MASMSP
+    MSPDir: ../crypto-config/peerOrganizations/mas.example.com/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+        Rule: "OR('MASMSP.admin', 'MASMSP.peer', 'MASMSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+        Rule: "OR('MASMSP.admin', 'MASMSP.client')"
       Admins:
         Type: Signature
-        Rule: "OR('Org1MSP.admin')"
+        Rule: "OR('MASMSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org1MSP.peer')"
+        Rule: "OR('MASMSP.peer')"
     AnchorPeers:
-      - Host: peer0.org1.example.com
+      - Host: peer0.mas.example.com
         Port: 7051
 
-  - &Org2
-    Name: Org2MSP
-    ID: Org2MSP
-    MSPDir: ../crypto-config/peerOrganizations/org2.example.com/msp
+  - &ING
+    Name: INGMSP
+    ID: INGMSP
+    MSPDir: ../crypto-config/peerOrganizations/ing.example.com/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
+        Rule: "OR('INGMSP.admin', 'INGMSP.peer', 'INGMSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
+        Rule: "OR('INGMSP.admin', 'INGMSP.client')"
       Admins:
         Type: Signature
-        Rule: "OR('Org2MSP.admin')"
+        Rule: "OR('INGMSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org2MSP.peer')"
+        Rule: "OR('INGMSP.peer')"
     AnchorPeers:
-      - Host: peer0.org2.example.com
+      - Host: peer0.ing.example.com
+        Port: 8051
+
+  - &OCBC
+    Name: OCBCMSP
+    ID: OCBCMSP
+    MSPDir: ../crypto-config/peerOrganizations/ocbc.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OCBCMSP.admin', 'OCBCMSP.peer', 'OCBCMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OCBCMSP.admin', 'OCBCMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OCBCMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('OCBCMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.ocbc.example.com
         Port: 9051
+
+  - &DBS
+    Name: DBSMSP
+    ID: DBSMSP
+    MSPDir: ../crypto-config/peerOrganizations/dbs.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('DBSMSP.admin', 'DBSMSP.peer', 'DBSMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('DBSMSP.admin', 'DBSMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('DBSMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('DBSMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.dbs.example.com
+        Port: 10051
 
 Capabilities:
   Channel: &ChannelCapabilities
@@ -135,22 +177,26 @@ Channel: &ChannelDefaults
     <<: *ChannelCapabilities
 
 Profiles:
-  TwoOrgsOrdererGenesis:
+  BankingOrdererGenesis:
     <<: *ChannelDefaults
     Orderer:
       <<: *OrdererDefaults
       Organizations:
         - *OrdererOrg
     Consortiums:
-      SampleConsortium:
+      BankingConsortium:
         Organizations:
-          - *Org1
-          - *Org2
-  TwoOrgsChannel:
-    Consortium: SampleConsortium
+          - *MAS
+          - *ING
+          - *OCBC
+          - *DBS
+  BankingChannel:
+    Consortium: BankingConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
-        - *Org1
-        - *Org2
+        - *MAS
+        - *ING
+        - *OCBC
+        - *DBS
