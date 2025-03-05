@@ -182,7 +182,7 @@ services:
 
   cli:
     container_name: cli
-    image: hyperledger/fabric-tools:2.5.0
+    image: fabric-tools-with-go:latest  # Using custom image instead of hyperledger/fabric-tools:2.5.0
     tty: true
     stdin_open: true
     environment:

@@ -167,3 +167,30 @@ func (s *SmartContract) GetAllAssets(ctx contractapi.TransactionContextInterface
 	defer resultsIterator.Close()
 
 	var assets []*Asset
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		var asset Asset
+		err = json.Unmarshal(queryResponse.Value, &asset)
+		if err != nil {
+			return nil, err
+		}
+		assets = append(assets, &asset)
+	}
+
+	return assets, nil
+}
+
+func main() {
+	assetChaincode, err := contractapi.NewChaincode(&SmartContract{})
+	if err != nil {
+		log.Panicf("Error creating asset-transfer-basic chaincode: %v", err)
+	}
+
+	if err := assetChaincode.Start(); err != nil {
+		log.Panicf("Error starting asset-transfer-basic chaincode: %v", err)
+	}
+}
