@@ -1,0 +1,40 @@
+# Hyperledger Fabric generated files
+/fabric-samples/
+/crypto-config/
+/channel-artifacts/
+
+# Environment files
+.env
+.DS_Store
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Log files
+*.log
+logs/
+
+# Binaries
+bin/
+build/
+dist/
+
+# Docker related
+.docker/
+docker-volumes/
