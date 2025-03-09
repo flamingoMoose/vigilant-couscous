@@ -10,8 +10,8 @@ if ($CONTAINERS.Count -lt 5) {
 }
 
 # Verify chaincode file exists
-if (-not (Test-Path -Path chaincode/basic/asset-transfer.go)) {
-    Write-Host "Error: Chaincode file not found at chaincode/basic/asset-transfer.go" -ForegroundColor Red
+if (-not (Test-Path -Path chaincode/basic/main.go)) {
+    Write-Host "Error: Main chaincode file not found at chaincode/basic/main.go" -ForegroundColor Red
     exit 1
 }
 
@@ -32,7 +32,12 @@ Set-Content -Path $GO_MOD_PATH -Value $GO_MOD_CONTENT -Force
 # Create chaincode structure and copy files
 Write-Host "Creating chaincode structure in CLI container..." -ForegroundColor Cyan
 docker exec cli bash -c "mkdir -p /opt/gopath/src/github.com/asset-transfer/"
-docker cp chaincode/basic/asset-transfer.go cli:/opt/gopath/src/github.com/asset-transfer/
+
+# Use recursive copy to copy all files (Windows PowerShell)
+Get-ChildItem -Path "chaincode/basic/" -Filter "*.go" | ForEach-Object {
+    docker cp $_.FullName cli:/opt/gopath/src/github.com/asset-transfer/
+}
+# Copy go.mod file
 docker cp chaincode/basic/go.mod cli:/opt/gopath/src/github.com/asset-transfer/
 
 # Set up Go environment and download dependencies
@@ -59,10 +64,23 @@ docker exec -e CORE_PEER_LOCALMSPID="DBSMSP" -e CORE_PEER_TLS_ENABLED=true -e CO
 # Get package ID
 Write-Host "Retrieving package ID..." -ForegroundColor Cyan
 $QUERY_INSTALLED = docker exec cli peer lifecycle chaincode queryinstalled
+Write-Host "Raw command output:"
 Write-Host $QUERY_INSTALLED
 
-# HARDCODE THE PACKAGE ID - We know it from the logs
-$PACKAGE_ID = "asset-transfer_1.0:5b3fb76f637d6c522d0405b067df0f496bd7b632d2ef761a5f8ea9d4cfba4600"
+# Extract using a simpler regex pattern
+$REGEX_PATTERN = 'asset-transfer_1\.0:[a-z0-9]+'
+$REGEX_MATCH = [regex]::Match($QUERY_INSTALLED, $REGEX_PATTERN)
+
+if ($REGEX_MATCH.Success) {
+    $PACKAGE_ID = $REGEX_MATCH.Value
+    Write-Host "Successfully extracted Package ID: $PACKAGE_ID" -ForegroundColor Green
+} else {
+    Write-Host "Failed to extract Package ID using regex." -ForegroundColor Red
+    # Prompt for manual entry
+    Write-Host "Please enter the Package ID from the output above:" -ForegroundColor Yellow
+    $PACKAGE_ID = Read-Host "Package ID"
+}
+
 Write-Host "Using Package ID: $PACKAGE_ID" -ForegroundColor Green
 
 # Approve from each organization
