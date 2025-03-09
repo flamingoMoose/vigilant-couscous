@@ -38,3 +38,4 @@ dist/
 # Docker related
 .docker/
 docker-volumes/
+vigilant-couscous/
