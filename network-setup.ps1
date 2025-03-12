@@ -99,3 +99,36 @@ Write-Host "`nVerifying peer0.dbs..."
 docker exec -e CORE_PEER_LOCALMSPID="DBSMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/peers/peer0.dbs.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/users/Admin@dbs.example.com/msp -e CORE_PEER_ADDRESS=peer0.dbs.example.com:10051 cli peer channel list
 
 Write-Host "`nNetwork setup complete!"
+
+# Copy MAS Admin certificate and private key for the Fabric Gateway API
+Write-Host "Copying MAS Admin cert, private key, and CA cert for Fabric Gateway API..."
+
+# Define source and destination paths
+$masCertSource = "C:\Users\Yusri Abdullah\Desktop\vigilant-couscous\crypto-config\peerOrganizations\mas.example.com\users\Admin@mas.example.com\msp\signcerts\Admin@mas.example.com-cert.pem"
+$masKeySource = Get-ChildItem -Path "C:\Users\Yusri Abdullah\Desktop\vigilant-couscous\crypto-config\peerOrganizations\mas.example.com\users\Admin@mas.example.com\msp\keystore\" -Filter "*_sk" | Select-Object -ExpandProperty FullName
+$masCaSource = "C:\Users\Yusri Abdullah\Desktop\vigilant-couscous\crypto-config\peerOrganizations\mas.example.com\tlsca\tlsca.mas.example.com-cert.pem"
+
+$apiCertDest = "C:\Users\Yusri Abdullah\Desktop\fabric-api\crypto\cert.pem"
+$apiKeyDest = "C:\Users\Yusri Abdullah\Desktop\fabric-api\crypto\key.pem"
+$apiCaDest = "C:\Users\Yusri Abdullah\Desktop\fabric-api\crypto\ca.pem"
+
+# Ensure destination directory exists
+New-Item -ItemType Directory -Path "C:\Users\Yusri Abdullah\Desktop\fabric-api\crypto" -Force
+
+# Copy certificate
+Copy-Item -Path $masCertSource -Destination $apiCertDest -Force
+Write-Host "✅ MAS Admin certificate copied to fabric-api."
+
+# Copy private key
+if ($masKeySource) {
+    Copy-Item -Path $masKeySource -Destination $apiKeyDest -Force
+    Write-Host "✅ MAS Admin private key copied to fabric-api."
+} else {
+    Write-Host "❌ ERROR: Private key not found! Check the keystore directory."
+}
+
+# Copy CA certificate
+Copy-Item -Path $masCaSource -Destination $apiCaDest -Force
+Write-Host "✅ MAS CA certificate copied to fabric-api."
+
+Write-Host "✅ MAS Admin cert, private key, and CA cert setup complete for Fabric Gateway API."
