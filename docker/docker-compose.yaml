@@ -1,8 +1,8 @@
 version: '2.4'
 
 networks:
-  hlf_network:
-    name: hlf_network
+  fabric_network:
+    external: true
 
 volumes:
   orderer.example.com:
@@ -41,14 +41,14 @@ services:
     ports:
       - 7050:7050
     networks:
-      - hlf_network
+      - fabric_network
 
   peer0.mas.example.com:
     container_name: peer0.mas.example.com
     image: hyperledger/fabric-peer:2.5.0
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=hlf_network
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_network
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_PROFILE_ENABLED=false
@@ -76,14 +76,14 @@ services:
     ports:
       - 7051:7051
     networks:
-      - hlf_network
+      - fabric_network
 
   peer0.ing.example.com:
     container_name: peer0.ing.example.com
     image: hyperledger/fabric-peer:2.5.0
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=hlf_network
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_network
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_PROFILE_ENABLED=false
@@ -110,14 +110,14 @@ services:
     ports:
       - 8051:8051
     networks:
-      - hlf_network
+      - fabric_network
 
   peer0.ocbc.example.com:
     container_name: peer0.ocbc.example.com
     image: hyperledger/fabric-peer:2.5.0
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=hlf_network
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_network
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_PROFILE_ENABLED=false
@@ -144,14 +144,14 @@ services:
     ports:
       - 9051:9051
     networks:
-      - hlf_network
+      - fabric_network
 
   peer0.dbs.example.com:
     container_name: peer0.dbs.example.com
     image: hyperledger/fabric-peer:2.5.0
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=hlf_network
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_network
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_PROFILE_ENABLED=false
@@ -178,7 +178,7 @@ services:
     ports:
       - 10051:10051
     networks:
-      - hlf_network
+      - fabric_network
 
   cli:
     container_name: cli
@@ -205,4 +205,4 @@ services:
       - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto
       - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
     networks:
-      - hlf_network
+      - fabric_network

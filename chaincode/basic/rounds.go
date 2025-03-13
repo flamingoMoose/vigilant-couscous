@@ -32,9 +32,26 @@ func (s *SmartContract) CreateTrainingRound(ctx contractapi.TransactionContextIn
 		return err
 	}
 
-	// Store with prefix to distinguish from other types
-	return ctx.GetStub().PutState("ROUND_"+id, roundJSON)
+	err = ctx.GetStub().PutState("ROUND_"+id, roundJSON)
+	if err != nil {
+		return err
+	}
+
+	// 🔥 Emit ROUND_STARTED event
+	eventPayload := map[string]string{
+		"round_id": id,
+		"initiator": initiator,
+		"description": description,
+	}
+	eventJSON, _ := json.Marshal(eventPayload)
+	err = ctx.GetStub().SetEvent("ROUND_STARTED", eventJSON)
+	if err != nil {
+		return fmt.Errorf("failed to emit ROUND_STARTED event: %v", err)
+	}
+
+	return nil
 }
+
 
 // GetTrainingRound returns a training round by ID
 func (s *SmartContract) GetTrainingRound(ctx contractapi.TransactionContextInterface, id string) (*TrainingRound, error) {

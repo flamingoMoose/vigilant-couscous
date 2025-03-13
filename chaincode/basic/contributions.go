@@ -10,10 +10,11 @@ import (
 
 // RecordModelContribution records a model contribution from a participant
 func (s *SmartContract) RecordModelContribution(ctx contractapi.TransactionContextInterface, id string, roundID string, 
-                                              participantID string, weightHash string, modelURI string, 
-                                              accuracyJSON string, statsJSON string) error {
+	participantID string, weightHash string, modelURI string, 
+	accuracyJSON string, statsJSON string) error {
+
 	// Check if round exists
-	round, err := s.GetTrainingRound(ctx, roundID)
+	_, err := s.GetTrainingRound(ctx, roundID)
 	if err != nil {
 		return err
 	}
@@ -28,8 +29,8 @@ func (s *SmartContract) RecordModelContribution(ctx contractapi.TransactionConte
 	// Parse training stats
 	var trainingStats map[string]string
 	err = json.Unmarshal([]byte(statsJSON), &trainingStats)
-	if err != nil {
-		return fmt.Errorf("failed to parse training stats: %v", err)
+		if err != nil {
+	return fmt.Errorf("failed to parse training stats: %v", err)
 	}
 
 	contribution := ModelContribution{
@@ -48,34 +49,31 @@ func (s *SmartContract) RecordModelContribution(ctx contractapi.TransactionConte
 		return err
 	}
 
-	// Also add this participant to the round if not already there
-	participantFound := false
-	for _, p := range round.Participants {
-		if p == participantID {
-			participantFound = true
-			break
-		}
+	err = ctx.GetStub().PutState("CONTRIBUTION_"+id, contributionJSON)
+	if err != nil {
+		return err
 	}
 
-	if !participantFound {
-		round.Participants = append(round.Participants, participantID)
-		roundJSON, err := json.Marshal(round)
-		if err != nil {
-			return err
-		}
-		err = ctx.GetStub().PutState("ROUND_"+roundID, roundJSON)
-		if err != nil {
-			return err
-		}
+	// Emit MODEL_UPLOADED event
+	eventPayload := map[string]string{
+		"round_id": roundID,
+		"bank_id": participantID,
+		"weight_hash": weightHash,
+		"model_uri": modelURI,
 	}
 
-	// Store the contribution
-	return ctx.GetStub().PutState("CONTRIBUTION_"+id, contributionJSON)
+	eventJSON, _ := json.Marshal(eventPayload)
+	err = ctx.GetStub().SetEvent("MODEL_UPLOADED", eventJSON)
+	if err != nil {
+		return fmt.Errorf("failed to emit MODEL_UPLOADED event: %v", err)
+	}
+
+	return nil
 }
 
 // RecordAggregatedModel records the final aggregated model for a round
 func (s *SmartContract) RecordAggregatedModel(ctx contractapi.TransactionContextInterface, roundID string, 
-                                           weightHash string, modelURI string) error {
+	weightHash string, modelURI string) error {
 	round, err := s.GetTrainingRound(ctx, roundID)
 	if err != nil {
 		return err
@@ -91,8 +89,27 @@ func (s *SmartContract) RecordAggregatedModel(ctx contractapi.TransactionContext
 		return err
 	}
 
-	return ctx.GetStub().PutState("ROUND_"+roundID, roundJSON)
+	err = ctx.GetStub().PutState("ROUND_"+roundID, roundJSON)
+	if err != nil {
+		return err
+	}
+
+	// Emit AGGREGATED_MODEL_SUBMITTED event
+	eventPayload := map[string]string{
+		"round_id": roundID,
+		"weight_hash": weightHash,
+		"model_uri": modelURI,
+	}
+
+	eventJSON, _ := json.Marshal(eventPayload)
+	err = ctx.GetStub().SetEvent("AGGREGATED_MODEL_SUBMITTED", eventJSON)
+	if err != nil {
+		return fmt.Errorf("failed to emit AGGREGATED_MODEL_SUBMITTED event: %v", err)
+	}
+
+	return nil
 }
+
 
 // GetContributionsByRound returns all model contributions for a specific round
 func (s *SmartContract) GetContributionsByRound(ctx contractapi.TransactionContextInterface, roundID string) ([]*ModelContribution, error) {
