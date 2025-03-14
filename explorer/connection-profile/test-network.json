@@ -1,48 +1,99 @@
 {
-	"name": "test-network",
-	"version": "1.0.0",
-	"client": {
-		"tlsEnable": true,
-		"adminCredential": {
-			"id": "exploreradmin",
-			"password": "exploreradminpw"
-		},
-		"enableAuthentication": true,
-		"organization": "MAS",
-		"connection": {
-			"timeout": {
-				"peer": {
-					"endorser": "300"
-				},
-				"orderer": "300"
-			}
-		}
-	},
-	"channels": {
-		"mychannel": {
-			"peers": {
-				"peer0.mas.example.com": {}
-			}
-		}
-	},
-	"organizations": {
-		"Org1MSP": {
-			"mspid": "MASMSP",
-			"adminPrivateKey": {
-				"path": "../organizations/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp/keystore/priv_sk"	// "path": "/tmp/crypto/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/priv_sk"
-			},
-			"peers": ["peer0.mas.example.com"],
-			"signedCert": {
-				"path": "../organizations/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp/signcerts/Admin@mas.example.com-cert" //"/tmp/crypto/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/User1@org1.example.com-cert.pem"
-			}
-		}
-	},
-	"peers": {
-		"peer0.mas.example.com": {
-			"tlsCACerts": {
-				"path": "../organizations/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt"
-			},
-			"url": "grpcs://peer0.mas.example.com:7051"
-		}
-	}
+    "name": "test-network",
+    "version": "1.0.0",
+    "client": {
+        "tlsEnable": true,
+        "adminCredential": {
+            "id": "exploreradmin",
+            "password": "exploreradminpw"
+        },
+        "enableAuthentication": true,
+        "organization": "MAS",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                },
+                "orderer": "300"
+            }
+        }
+    },
+    "channels": {
+        "mychannel": {
+            "peers": {
+                "peer0.mas.example.com": {},
+                "peer0.ocbc.example.com": {},
+                "peer0.ing.example.com": {},
+                "peer0.dbs.example.com": {}
+            }
+        }
+    },
+    "organizations": {
+        "MAS": {
+            "mspid": "MASMSP",
+            "adminPrivateKey": {
+                "path": "../organizations/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp/keystore/priv_sk"
+            },
+            "peers": ["peer0.mas.example.com"],
+            "signedCert": {
+                "path": "../organizations/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp/signcerts/Admin@mas.example.com-cert.pem"
+            }
+        },
+        "OCBC": {
+            "mspid": "OCBCMSP",
+            "adminPrivateKey": {
+                "path": "../organizations/peerOrganizations/ocbc.example.com/users/Admin@ocbc.example.com/msp/keystore/priv_sk"
+            },
+            "peers": ["peer0.ocbc.example.com"],
+            "signedCert": {
+                "path": "../organizations/peerOrganizations/ocbc.example.com/users/Admin@ocbc.example.com/msp/signcerts/Admin@ocbc.example.com-cert.pem"
+            }
+        },
+        "ING": {
+            "mspid": "INGMSP",
+            "adminPrivateKey": {
+                "path": "../organizations/peerOrganizations/ing.example.com/users/Admin@ing.example.com/msp/keystore/priv_sk"
+            },
+            "peers": ["peer0.ing.example.com"],
+            "signedCert": {
+                "path": "../organizations/peerOrganizations/ing.example.com/users/Admin@ing.example.com/msp/signcerts/Admin@ing.example.com-cert.pem"
+            }
+        },
+        "DBS": {
+            "mspid": "DBSMSP",
+            "adminPrivateKey": {
+                "path": "../organizations/peerOrganizations/dbs.example.com/users/Admin@dbs.example.com/msp/keystore/priv_sk"
+            },
+            "peers": ["peer0.dbs.example.com"],
+            "signedCert": {
+                "path": "../organizations/peerOrganizations/dbs.example.com/users/Admin@dbs.example.com/msp/signcerts/Admin@dbs.example.com-cert.pem"
+            }
+        }
+    },
+    "peers": {
+        "peer0.mas.example.com": {
+            "tlsCACerts": {
+                "path": "../organizations/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt"
+            },
+            "url": "grpcs://peer0.mas.example.com:7051"
+        },
+        "peer0.ocbc.example.com": {
+            "tlsCACerts": {
+                "path": "../organizations/peerOrganizations/ocbc.example.com/peers/peer0.ocbc.example.com/tls/ca.crt"
+            },
+            "url": "grpcs://peer0.ocbc.example.com:9051"
+        },
+        "peer0.ing.example.com": {
+            "tlsCACerts": {
+                "path": "../organizations/peerOrganizations/ing.example.com/peers/peer0.ing.example.com/tls/ca.crt"
+            },
+            "url": "grpcs://peer0.ing.example.com:8051"
+        },
+        "peer0.dbs.example.com": {
+            "tlsCACerts": {
+                "path": "../organizations/peerOrganizations/dbs.example.com/peers/peer0.dbs.example.com/tls/ca.crt"
+            },
+            "url": "grpcs://peer0.dbs.example.com:10051"
+        }
+    }
 }

@@ -46,10 +46,12 @@ cp .env.sample .env
 #### For Mac/Linux:
 
 ```bash
-# Make the script executable
-chmod +x scripts/setup-network.sh
-# Run the setup script
-./scripts/setup-network.sh
+# install powershell via homebrew (much easier)
+brew install --cask powershell
+# run powershell (on the correct dict)
+pwsh
+# Run the PowerShell setup script
+.\network-setup.ps1
 ```
 
 #### For Windows:
@@ -64,8 +66,13 @@ chmod +x scripts/setup-network.sh
 #### For Mac/Linux:
 
 ```bash
+#errr i dont think theres a file named test-network.sh? -han yi
+
+# Make the script executable
+chmod +x scripts/network.sh
+
 # Run the status check script
-./scripts/check-network.sh
+./scripts/network.sh 
 ```
 
 #### For Windows:
@@ -75,6 +82,11 @@ chmod +x scripts/setup-network.sh
 .\network-status.bat
 ```
 
+### 6. Start Hyperledger Explorer
+
+```powershell
+.\start-explorer.ps1
+```
 ## Directory Structure
 
 - `chaincode/`: Chaincode source code
