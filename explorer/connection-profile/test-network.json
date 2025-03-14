@@ -8,7 +8,7 @@
 			"password": "exploreradminpw"
 		},
 		"enableAuthentication": true,
-		"organization": "Org1MSP",
+		"organization": "MAS",
 		"connection": {
 			"timeout": {
 				"peer": {
@@ -27,7 +27,7 @@
 	},
 	"organizations": {
 		"Org1MSP": {
-			"mspid": "Org1MSP",
+			"mspid": "MASMSP",
 			"adminPrivateKey": {
 				"path": "../organizations/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp/keystore/priv_sk"	// "path": "/tmp/crypto/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/priv_sk"
 			},
