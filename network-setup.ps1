@@ -22,6 +22,7 @@ Write-Host "Generating crypto material..."
 ./fabric-samples/bin/cryptogen generate --config=./organizations/cryptogen/crypto-config-ing.yaml --output=crypto-config
 ./fabric-samples/bin/cryptogen generate --config=./organizations/cryptogen/crypto-config-ocbc.yaml --output=crypto-config
 ./fabric-samples/bin/cryptogen generate --config=./organizations/cryptogen/crypto-config-dbs.yaml --output=crypto-config
+./fabric-samples/bin/cryptogen generate --config=./organizations/cryptogen/crypto-config-aggregator.yaml --output=crypto-config
 
 # Fix directory paths in config files - replace Windows backslashes with forward slashes
 Write-Host "Fixing path separators in crypto-config..."

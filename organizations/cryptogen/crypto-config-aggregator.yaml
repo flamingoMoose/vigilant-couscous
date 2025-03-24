@@ -1,0 +1,11 @@
+# crypto-config-aggregator.yaml
+OrdererOrgs: []
+
+PeerOrgs:
+  - Name: Aggregator
+    Domain: aggregator.example.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 1
