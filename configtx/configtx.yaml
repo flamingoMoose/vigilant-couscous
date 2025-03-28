@@ -15,7 +15,11 @@ Organizations:
         Type: Signature
         Rule: "OR('OrdererMSP.admin')"
     OrdererEndpoints:
-      - orderer.example.com:7050
+      - orderer1.example.com:7050
+      - orderer2.example.com:7060
+      - orderer3.example.com:7070
+      - orderer4.example.com:7080
+      - orderer5.example.com:7090
 
   - &MAS
     Name: MASMSP
@@ -151,7 +155,11 @@ Application: &ApplicationDefaults
 Orderer: &OrdererDefaults
   OrdererType: etcdraft
   Addresses:
-    - orderer.example.com:7050
+    - orderer1.example.com:7050
+    - orderer2.example.com:7060
+    - orderer3.example.com:7070
+    - orderer4.example.com:7080
+    - orderer5.example.com:7090
   BatchTimeout: 2s
   BatchSize:
     MaxMessageCount: 10
@@ -173,10 +181,26 @@ Orderer: &OrdererDefaults
       Rule: "ANY Writers"
   EtcdRaft:
     Consenters:
-      - Host: orderer.example.com
+      - Host: orderer1.example.com
         Port: 7050
-        ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
-        ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+        ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+        ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+      - Host: orderer2.example.com
+        Port: 7060
+        ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+        ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+      - Host: orderer3.example.com
+        Port: 7070
+        ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+        ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+      - Host: orderer4.example.com
+        Port: 7080
+        ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
+        ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
+      - Host: orderer5.example.com
+        Port: 7090
+        ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
+        ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
   Capabilities:
     <<: *OrdererCapabilities
 

@@ -1,10 +1,10 @@
-# File-based chaincode deployment script
+# File-based chaincode deployment script for RAFT Consensus
 # Run after network setup is complete
 
 # Check that the network is running
 Write-Host "Checking that the network is running..." -ForegroundColor Cyan
 $CONTAINERS = docker ps --format "{{.Names}}" | Select-String -Pattern "peer0|orderer"
-if ($CONTAINERS.Count -lt 5) {
+if ($CONTAINERS.Count -lt 9) {  # Check for 5 orderers + 4 peers
     Write-Host "Error: Network containers are not all running. Please run network setup first." -ForegroundColor Red
     exit 1
 }
@@ -83,39 +83,42 @@ if ($REGEX_MATCH.Success) {
 
 Write-Host "Using Package ID: $PACKAGE_ID" -ForegroundColor Green
 
-# Approve from each organization
+# Set the orderer CA path (using orderer1)
+$ORDERER_CA = "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+
+# Approve from each organization - using orderer1
 Write-Host "Approving from MASMSP..." -ForegroundColor Cyan
-docker exec -e CORE_PEER_LOCALMSPID="MASMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp -e CORE_PEER_ADDRESS=peer0.mas.example.com:7051 cli peer lifecycle chaincode approveformyorg -o orderer.example.com:7050 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --channelID hlftffv1 --name asset-transfer --version 1.0 --package-id $PACKAGE_ID --sequence 1 --init-required
+docker exec -e CORE_PEER_LOCALMSPID="MASMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp -e CORE_PEER_ADDRESS=peer0.mas.example.com:7051 cli peer lifecycle chaincode approveformyorg -o orderer1.example.com:7050 --tls --cafile $ORDERER_CA --channelID hlftffv1 --name asset-transfer --version 1.0 --package-id $PACKAGE_ID --sequence 1 --init-required
 
 Write-Host "Approving from INGMSP..." -ForegroundColor Cyan
-docker exec -e CORE_PEER_LOCALMSPID="INGMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ing.example.com/peers/peer0.ing.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ing.example.com/users/Admin@ing.example.com/msp -e CORE_PEER_ADDRESS=peer0.ing.example.com:8051 cli peer lifecycle chaincode approveformyorg -o orderer.example.com:7050 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --channelID hlftffv1 --name asset-transfer --version 1.0 --package-id $PACKAGE_ID --sequence 1 --init-required
+docker exec -e CORE_PEER_LOCALMSPID="INGMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ing.example.com/peers/peer0.ing.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ing.example.com/users/Admin@ing.example.com/msp -e CORE_PEER_ADDRESS=peer0.ing.example.com:8051 cli peer lifecycle chaincode approveformyorg -o orderer1.example.com:7050 --tls --cafile $ORDERER_CA --channelID hlftffv1 --name asset-transfer --version 1.0 --package-id $PACKAGE_ID --sequence 1 --init-required
 
 Write-Host "Approving from OCBCMSP..." -ForegroundColor Cyan
-docker exec -e CORE_PEER_LOCALMSPID="OCBCMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ocbc.example.com/peers/peer0.ocbc.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ocbc.example.com/users/Admin@ocbc.example.com/msp -e CORE_PEER_ADDRESS=peer0.ocbc.example.com:9051 cli peer lifecycle chaincode approveformyorg -o orderer.example.com:7050 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --channelID hlftffv1 --name asset-transfer --version 1.0 --package-id $PACKAGE_ID --sequence 1 --init-required
+docker exec -e CORE_PEER_LOCALMSPID="OCBCMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ocbc.example.com/peers/peer0.ocbc.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ocbc.example.com/users/Admin@ocbc.example.com/msp -e CORE_PEER_ADDRESS=peer0.ocbc.example.com:9051 cli peer lifecycle chaincode approveformyorg -o orderer1.example.com:7050 --tls --cafile $ORDERER_CA --channelID hlftffv1 --name asset-transfer --version 1.0 --package-id $PACKAGE_ID --sequence 1 --init-required
 
 Write-Host "Approving from DBSMSP..." -ForegroundColor Cyan
-docker exec -e CORE_PEER_LOCALMSPID="DBSMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/peers/peer0.dbs.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/users/Admin@dbs.example.com/msp -e CORE_PEER_ADDRESS=peer0.dbs.example.com:10051 cli peer lifecycle chaincode approveformyorg -o orderer.example.com:7050 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --channelID hlftffv1 --name asset-transfer --version 1.0 --package-id $PACKAGE_ID --sequence 1 --init-required
+docker exec -e CORE_PEER_LOCALMSPID="DBSMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/peers/peer0.dbs.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/users/Admin@dbs.example.com/msp -e CORE_PEER_ADDRESS=peer0.dbs.example.com:10051 cli peer lifecycle chaincode approveformyorg -o orderer1.example.com:7050 --tls --cafile $ORDERER_CA --channelID hlftffv1 --name asset-transfer --version 1.0 --package-id $PACKAGE_ID --sequence 1 --init-required
 
 # Check commit readiness
 Write-Host "Checking commit readiness..." -ForegroundColor Cyan
 $COMMIT_READINESS = docker exec cli peer lifecycle chaincode checkcommitreadiness --channelID hlftffv1 --name asset-transfer --version 1.0 --sequence 1 --output json --init-required
 Write-Host $COMMIT_READINESS
 
-# Commit chaincode definition to channel - Include all four peers for endorsement 
+# Commit chaincode definition to channel - Include all four peers for endorsement, using orderer1 
 Write-Host "Committing chaincode definition..." -ForegroundColor Green
-docker exec -e CORE_PEER_LOCALMSPID="MASMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp -e CORE_PEER_ADDRESS=peer0.mas.example.com:7051 cli peer lifecycle chaincode commit -o orderer.example.com:7050 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --channelID hlftffv1 --name asset-transfer --version 1.0 --sequence 1 --init-required --peerAddresses peer0.mas.example.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt --peerAddresses peer0.ing.example.com:8051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ing.example.com/peers/peer0.ing.example.com/tls/ca.crt --peerAddresses peer0.ocbc.example.com:9051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ocbc.example.com/peers/peer0.ocbc.example.com/tls/ca.crt --peerAddresses peer0.dbs.example.com:10051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/peers/peer0.dbs.example.com/tls/ca.crt
+docker exec -e CORE_PEER_LOCALMSPID="MASMSP" -e CORE_PEER_TLS_ENABLED=true -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/users/Admin@mas.example.com/msp -e CORE_PEER_ADDRESS=peer0.mas.example.com:7051 cli peer lifecycle chaincode commit -o orderer1.example.com:7050 --tls --cafile $ORDERER_CA --channelID hlftffv1 --name asset-transfer --version 1.0 --sequence 1 --init-required --peerAddresses peer0.mas.example.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt --peerAddresses peer0.ing.example.com:8051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ing.example.com/peers/peer0.ing.example.com/tls/ca.crt --peerAddresses peer0.ocbc.example.com:9051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ocbc.example.com/peers/peer0.ocbc.example.com/tls/ca.crt --peerAddresses peer0.dbs.example.com:10051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/peers/peer0.dbs.example.com/tls/ca.crt
 
-# Wait briefly to ensure commit is propagated
-Write-Host "Waiting for commit to be propagated (5 seconds)..." -ForegroundColor Cyan
-Start-Sleep -Seconds 5
+# Wait a bit longer to ensure commit is propagated across RAFT orderers
+Write-Host "Waiting for commit to be propagated (10 seconds)..." -ForegroundColor Cyan
+Start-Sleep -Seconds 10
 
 # Initialize chaincode (inline JSON without cat)
 Write-Host "Initializing chaincode..." -ForegroundColor Green
 docker exec cli peer chaincode invoke `
-    -o orderer.example.com:7050 `
+    -o orderer1.example.com:7050 `
     --isInit `
     --tls `
-    --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem `
+    --cafile $ORDERER_CA `
     -C hlftffv1 -n asset-transfer `
     --peerAddresses peer0.mas.example.com:7051 `
     --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/mas.example.com/peers/peer0.mas.example.com/tls/ca.crt `
@@ -127,9 +130,9 @@ docker exec cli peer chaincode invoke `
     --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dbs.example.com/peers/peer0.dbs.example.com/tls/ca.crt `
     -c '{\"function\":\"InitLedger\",\"Args\":[]}'
 
-# Wait for initialization to complete
-Write-Host "Waiting for initialization (5 seconds)..." -ForegroundColor Cyan
-Start-Sleep -Seconds 5
+# Wait longer for initialization to complete across RAFT orderers
+Write-Host "Waiting for initialization (10 seconds)..." -ForegroundColor Cyan
+Start-Sleep -Seconds 10
 
 # Verify by querying chaincode directly
 Write-Host "Querying all assets to verify initialization..." -ForegroundColor Green
@@ -137,4 +140,4 @@ docker exec cli peer chaincode query `
     -C hlftffv1 -n asset-transfer `
     -c '{\"Args\":[\"GetAllAssets\"]}'
 
-Write-Host "`nChaincode deployment complete!" -ForegroundColor Green
+Write-Host "`nChaincode deployment complete with RAFT consensus!" -ForegroundColor Green
